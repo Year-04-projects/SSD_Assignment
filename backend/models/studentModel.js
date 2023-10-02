@@ -20,29 +20,29 @@ const studentSchema = new mongoose.Schema(
     },
     nic: {
       type: String,
-      required: [true, "Please enter your NIC"],
+      // required: [true, "Please enter your NIC"],
       unique: true,
       trim: true,
     },
     address: {
       type: String,
-      required: [true, "Please enter your address"],
+      // required: [true, "Please enter your address"],
     },
     phone: {
       type: String,
-      required: [true, "Please enter your phone number"],
+      // required: [true, "Please enter your phone number"],
     },
     gender: {
       type: String,
-      required: [true, "Please enter your gender"],
+      // required: [true, "Please enter your gender"],
     },
     password: {
       type: String,
-      required: [true, "Please enter your password"],
+      // required: [true, "Please enter your password"],
     },
     dob: {
       type: Date,
-      required: [true, "Please enter your date of birth"],
+      // required: [true, "Please enter your date of birth"],
       default: Date.now,
     },
     thumbnail: {

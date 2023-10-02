@@ -20,16 +20,33 @@ const initialState = {
   password2: "",
   gender: "",
   err: "",
-  success: "",
+  success: "", 
 };
 
 function StudentProfile() {
   const auth = useSelector((state) => state.auth);
   const token = useSelector((state) => state.token);
   const { student, isLogged } = auth;
+  console.log("fdfdsf",student)
   const history = useHistory();
   const [data, setData] = useState(initialState);
   const [thumbnail, setThumbnail] = useState(false);
+
+  const [studentdata, setStudentdata] = useState([]);
+
+  const loaddata = async (e) => {
+    if (student.length===0) {
+      
+      const googleToken = localStorage.getItem("googleToken");
+      const response = await axios.post("/student/getuserwauth", { token:googleToken });
+      console.log("respone",response.data.user)
+      setStudentdata(response.data.user)
+
+    }
+  }
+  useEffect(() => {
+    loaddata();
+  }, [student]);
   const {
     firstName,
     lastName,
@@ -95,11 +112,11 @@ function StudentProfile() {
       axios.patch(
         "/student/update",
         {
-          firstName: firstName ? firstName : student.firstName,
-          lastName: lastName ? lastName : student.lastName,
-          address: address ? address : student.address,
-          phone: phone ? phone : student.phone,
-          thumbnail: thumbnail ? thumbnail : student.thumbnail,
+          firstName: firstName ? firstName : studentdata.firstName,
+          lastName: lastName ? lastName : studentdata.lastName,
+          address: address ? address : studentdata.address,
+          phone: phone ? phone : studentdata.phone,
+          thumbnail: thumbnail ? thumbnail : studentdata.thumbnail,
         },
         {
           headers: { Authorization: token },
@@ -151,10 +168,10 @@ function StudentProfile() {
           "Are you sure you want to delete your account? This action is irreversible."
         )
       ) {
-        axios.delete(`student/delete/${student._id}`, {
+        axios.delete(`student/delete/${studentdata._id}`, {
           headers: { Authorization: token },
         });
-        dispatch(dispatchDelete(student.id));
+        dispatch(dispatchDelete(studentdata.id));
         localStorage.removeItem("firstLogin");
         history.push("/studentregister");
       }
@@ -178,7 +195,7 @@ function StudentProfile() {
           <h2 className="h4 text-center subtitle">Student Profile</h2>
           <div className="studentThumbnail">
             <img
-              src={thumbnail ? thumbnail : student.thumbnail}
+              src={thumbnail ? thumbnail : studentdata.thumbnail}
               alt=""
               className="img-fluid"
             />
@@ -202,7 +219,7 @@ function StudentProfile() {
                   name="firstName"
                   className="form-control form-control-sm"
                   placeholder="First Name"
-                  defaultValue={student.firstName}
+                  defaultValue={student.firstName ??studentdata.firstName}
                   id="firstName"
                   onChange={handleChange}
                 />
@@ -214,7 +231,7 @@ function StudentProfile() {
                   name="lastName"
                   className="form-control form-control-sm"
                   placeholder="Last Name"
-                  defaultValue={student.lastName}
+                  defaultValue={student.lastName??studentdata.lastName}
                   id="lastName"
                   onChange={handleChange}
                 />
@@ -228,7 +245,7 @@ function StudentProfile() {
                   name="email"
                   className="form-control form-control-sm"
                   placeholder="Email"
-                  defaultValue={student.email}
+                  defaultValue={student.email??studentdata.email}
                   id="email"
                   disabled
                 />
@@ -242,7 +259,7 @@ function StudentProfile() {
                   name="address"
                   className="form-control form-control-sm"
                   placeholder="Address"
-                  defaultValue={student.address}
+                  defaultValue={student.address??studentdata.address}
                   id="address"
                   onChange={handleChange}
                 />
@@ -256,7 +273,7 @@ function StudentProfile() {
                   name="phone"
                   className="form-control form-control-sm"
                   placeholder="Phone"
-                  defaultValue={student.phone}
+                  defaultValue={student.phone??studentdata.phone}
                   id="phone"
                   onChange={handleChange}
                 />
@@ -268,7 +285,7 @@ function StudentProfile() {
                   name="gender"
                   className="form-control form-control-sm"
                   placeholder="Gender"
-                  defaultValue={student.gender}
+                  defaultValue={student.gender??studentdata.gender}
                   id="gender"
                   disabled
                 />

@@ -3,6 +3,13 @@ import React from 'react'
 import {Link} from 'react-router-dom';
 import { useSelector } from "react-redux";
 import axios from "axios";
+import {GoogleLogout} from 'react-google-login';
+import config from "../config";
+
+
+
+const clientId=config.clientid
+
 
 function Header() {
   const auth = useSelector((state) => state.auth);
@@ -13,6 +20,7 @@ function Header() {
     try {
       await axios.get("/student/logout");
       localStorage.removeItem("firstLogin");
+      localStorage.removeItem("googleToken");
       window.location.href = "/studentlogin";
     } catch (err) {
       window.location.href = "/";
@@ -24,12 +32,18 @@ function Header() {
       <div className="profilePic">
         <img src={student.thumbnail} alt="" className="img-fluid" />
         <p>
-          <Link to="/profile" className="personName">
+        <GoogleLogout
+
+          clientId={clientId}
+          buttonText={"Logout"}
+          onLogoutSuccess={studentLogout}
+        />
+          {/* <Link to="/profile" className="personName">
             {student.firstName}
           </Link>
           <p onClick={studentLogout} className="logout">
             Logout
-          </p>
+          </p> */}
         </p>
       </div>
     );
@@ -199,3 +213,5 @@ function Header() {
 }
 
 export default Header;
+
+// fshfds

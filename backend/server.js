@@ -7,12 +7,26 @@ const path = require('path');
 const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
 require("dotenv").config();
-
+require("./auth");
+const passport=require("passport");
 const PORT = process.env.PORT || 8070;
+const session=require('express-session');
+
 
 app.use(express.json());
 app.use(cors());
 app.use(cookieParser());
+function isLoggedIn(req,res,next){
+ req.user?next():res.sendStatus(401);   
+}
+app.use(session({
+    secret:'mysecret',
+    resave:false,
+    saveUninitialized:true,
+    cookie:{secure:false}
+}))
+app.use(passport.initialize());
+app.use(passport.session());
 // app.use(
 //   fileUpload({
 //     useTempFiles: true,
@@ -21,6 +35,39 @@ app.use(cookieParser());
 app.use('./uploads',express.static(path.join(__dirname,'uploads')));
 
 app.use(bodyParser.json());
+
+
+app.get('/auth/google',passport.authenticate('google',{
+    scope: ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
+
+}))
+
+app.get("/auth/google/callback",
+passport.authenticate('google',{
+    successRedirect:'/auth/protected',
+    failureRedirect:'/auth/google/failure'
+}))
+
+app.get('/auth/protected',isLoggedIn,(req,res)=>{
+    console.log("req.user",req.user.given_name)
+    // let name=req.user.displayName();
+
+    res.send(`Helllo there! ${req.user.given_name}`)
+    res.redirect('http://localhost:3000');
+})
+app.get('/auth/google/failure',isLoggedIn,(req,res)=>{
+    res.send("Error in auth here!")
+})
+app.get('/auth/logout', (req, res) => {
+    console.log("log out")
+    req.logout((err) => {
+        if (err) {
+            console.error(err);
+        }
+        res.redirect('http://localhost:3000');
+    });
+});
+
 
 const URL = process.env.MONGODB_URL;
 

@@ -8,6 +8,9 @@ router.post("/activation", studentCtrl.activateEmail);
 
 router.post("/login", studentCtrl.login);
 
+router.post("/googleauth", studentCtrl.GoogleAuth);
+router.post("/getuserwauth", studentCtrl.GetUserdatawauth);
+
 router.post("/refreshtoken", studentCtrl.getAccessToken);
 
 router.post("/forgot", studentCtrl.forgotPassword);

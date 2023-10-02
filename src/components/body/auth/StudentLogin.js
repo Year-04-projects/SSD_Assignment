@@ -7,6 +7,13 @@ import {
 } from "../../utils/notification/notification";
 import { dispatchLogin } from "../../../redux/actions/authAction";
 import { useDispatch } from "react-redux";
+import {GoogleLogin} from 'react-google-login';
+
+import config from "../../../config";
+
+
+
+const clientId=config.clientid
 
 const initialState = {
   email: "",
@@ -16,6 +23,19 @@ const initialState = {
 };
 
 function StudentLogin() {
+
+  const googleAuth=async (res)=> {
+    console.log("res",res)
+    const googleToken = res.tokenId;
+    localStorage.setItem('googleToken', googleToken);
+    const response = await axios.post("/student/googleauth", { token:googleToken });
+    
+    console.log("responese",response.data.user)
+    dispatch(dispatchLogin());
+    history.push("/profile");
+
+  }
+
   const [student, setStudent] = useState(initialState);
   const dispatch = useDispatch();
   const history = useHistory();
@@ -31,6 +51,7 @@ function StudentLogin() {
     e.preventDefault();
 
     try {
+
       const res = await axios.post("/student/login", { email, password });
       setStudent({ ...student, err: "", success: res.data.msg });
 
@@ -86,11 +107,21 @@ function StudentLogin() {
               <button type="submit" className="btn d-inline-block btn-success">
                 Login
               </button>
+            </div>
+            <div class="form-group mt-1 d-flex align-items-center justify-content-center">
+            <GoogleLogin
+              clientId={clientId}
+              buttonText="Google Login"
+              onSuccess={googleAuth}
+              onFailure={(e)=>console.log("faile",e)}
+              cookiePolicy={'single_host_origin'}
+              isSignedIn={false}
+            />
+            </div>
+            <div className="form-group mt-3">
               <Link to="/forgotpassword" className="inline-link">
                 Forgot password?
               </Link>
-            </div>
-            <div className="form-group mt-3">
               <p>
                 New student?
                 <Link to="/studentregister" className="inline-link">

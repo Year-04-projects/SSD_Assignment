@@ -26,6 +26,10 @@ const initialState = {
 };
 
 function StudentRegister() {
+  const googleAuth = () => {
+    window.open("http://localhost:3000/student/google/callback", "_self");
+  };
+
   const [student, setStudent] = useState(initialState);
 
   const [gender, setGender] = useState("Male");
@@ -236,6 +240,11 @@ function StudentRegister() {
             <div className="mb-3 mt-1 d-flex align-items-center justify-content-between">
               <button type="submit" className="btn d-inline-block btn-success">
                 Register
+              </button>
+            </div>
+            <div class="form-group mt-1 d-flex align-items-center justify-content-center">
+              <button onClick={googleAuth} class="btn btn-primary">
+                <i class="fab fa-google"></i> Sign in with Google
               </button>
             </div>
             <div className="form-group">

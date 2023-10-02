@@ -83,8 +83,13 @@ import InsertContactus from './components/InsertContactus';
 import Header from './shared/Header';
 import Footer from './shared/Footer';
 import home from './shared/home';
-
 import {BrowserRouter as Router, Route} from "react-router-dom"
+import { gapi } from "gapi-script";
+import config from "./config";
+
+
+const clientId=config.clientid
+
 
 function App() {
   const dispatch = useDispatch();
@@ -97,7 +102,7 @@ function App() {
     if (firstLogin) {
       const getToken = async () => {
         const res = await axios.post("/student/refreshtoken", null);
-        dispatch({ type: "GET_TOKEN", payload: res.data.access_token });
+        dispatch({ type: "GET_TOKEN", payload: res.data.access_token }); 
       };
       getToken();
     }
@@ -114,6 +119,17 @@ function App() {
       getStudent();
     }
   }, [token, dispatch]);
+
+
+  useEffect(() => {
+    function start(){
+      gapi.client.init({
+        clientId:clientId,
+        scope:""
+      })
+    }
+    gapi.load('client:auth2',start)
+  }, []);
 
   return (
     <Router>
