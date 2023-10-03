@@ -13,7 +13,8 @@ const passport=require("passport");
 const PORT = process.env.PORT || 8070;
 const session=require('express-session');
 const rateLimit = require("express-rate-limit");
-const timeout = require("connect-timeout"); 
+const timeout = require("connect-timeout");
+const helmet = require('helmet');
 
 //limiter to minimize brutforce attack
 const limiter = rateLimit({
@@ -30,6 +31,7 @@ function isLoggedIn(req,res,next){
  req.user?next():res.sendStatus(401);   
 }
 
+app.use(helmet());
 
 app.use(session({
     secret:'mysecret',
