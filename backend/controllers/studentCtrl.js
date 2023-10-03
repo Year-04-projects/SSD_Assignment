@@ -2,14 +2,27 @@ const Students = require("../models/studentModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const sendMail = require("./sendMail");
-const { OAuth2Client } = require('google-auth-library');
+const { OAuth2Client } = require("google-auth-library");
+const logger = require("../logger/logger");
 
 const { CLIENT_URL } = process.env;
 
+//input santaization logic
+function sanitizeInputs(input) {
+  const rmvHtml = input.replace(/<[^>]*>/g, "");
+  const safeChrts = rmvHtml.replace(/[&<>"'`=\/]/g, "");
+  const trimmedInput = safeChrts.trim();
+  const finalInput = trimmedInput;
+
+  return finalInput;
+}
+
 const studentCtrl = {
   register: async (req, res) => {
+    // console.log(req.body);
+    logger.info("Student Registration request received");
     try {
-      const {
+      var {
         firstName,
         lastName,
         email,
@@ -31,6 +44,14 @@ const studentCtrl = {
         !password
       )
         return res.status(400).json({ msg: "Please fill in all fields" });
+
+      firstName = sanitizeInputs(firstName);
+      lastName = sanitizeInputs(lastName);
+      email = sanitizeInputs(email);
+      nic = sanitizeInputs(nic);
+      address = sanitizeInputs(address);
+      phone = sanitizeInputs(phone);
+      gender = sanitizeInputs(gender);
 
       if (!validateEmail(email))
         return res.status(400).json({ msg: "Invalid email" });
@@ -56,16 +77,13 @@ const studentCtrl = {
         password: passwordHash,
       });
       await newStudent.save();
-      // const activation_token = createActivationToken(newStudent);
-
-      // const url = `${CLIENT_URL}/student/activate/${activation_token}`;
-      // sendMail(email, url, "Verify your email address");
 
       res.json({
         msg: "Register success! ",
       });
     } catch (err) {
-      return res.status(500).json({ msg: err.message });
+      logger.err("Error in Registration", err.message);
+      return res.status(500).json({ msg: "error in registering" });
     }
   },
   activateEmail: async (req, res) => {
@@ -110,11 +128,11 @@ const studentCtrl = {
     }
   },
   GetUserdatawauth: async (req, res) => {
-    const clientId=process.env.CLIENT_ID
+    const clientId = process.env.CLIENT_ID;
     const { token } = req.body;
 
     if (!token) {
-      return res.status(400).json({ error: 'No Token Provided' });
+      return res.status(400).json({ error: "No Token Provided" });
     }
     const client = new OAuth2Client(clientId);
     try {
@@ -123,18 +141,18 @@ const studentCtrl = {
         audience: clientId,
       });
       const payload = ticket.getPayload();
-      const student = await Students.findOne({ email:payload.email });
-      return res.status(200).json({ message: 'DATA FOUND', user: student });
+      const student = await Students.findOne({ email: payload.email });
+      return res.status(200).json({ message: "DATA FOUND", user: student });
     } catch (error) {
-      return res.status(200).json({ message: 'Data Not Found' });
+      return res.status(200).json({ message: "Data Not Found" });
     }
   },
   GoogleAuth: async (req, res) => {
-    const clientId=process.env.CLIENT_ID
+    const clientId = process.env.CLIENT_ID;
     const { token } = req.body;
 
     if (!token) {
-      return res.status(400).json({ error: 'No Token Provided' });
+      return res.status(400).json({ error: "No Token Provided" });
     }
     const client = new OAuth2Client(clientId);
 
@@ -144,21 +162,21 @@ const studentCtrl = {
         audience: clientId,
       });
       const payload = ticket.getPayload();
-      const student = await Students.findOne({ email:payload.email });
+      const student = await Students.findOne({ email: payload.email });
       if (!student) {
         const newStudent = new Students({
-          firstName:payload.given_name,
-          lastName:payload.family_name,
-          email:payload.email,
-          nic:"null",
-          address:"null",
-          phone:"null",
-          gender:"null",
-          thumbnail:payload.picture
+          firstName: payload.given_name,
+          lastName: payload.family_name,
+          email: payload.email,
+          nic: "null",
+          address: "null",
+          phone: "null",
+          gender: "null",
+          thumbnail: payload.picture,
         });
         await newStudent.save();
       }
-      const studentnew = await Students.findOne({ email:payload.email });
+      const studentnew = await Students.findOne({ email: payload.email });
 
       const refresh_token = createRefreshToken({ id: studentnew._id });
       res.cookie("refreshtoken", refresh_token, {
@@ -166,19 +184,21 @@ const studentCtrl = {
         path: "/student/refreshtoken",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7days
       });
-      return res.status(200).json({ message: 'Token is valid Login success', user: studentnew });
-
+      return res
+        .status(200)
+        .json({ message: "Token is valid Login success", user: studentnew });
     } catch (error) {
-      console.log("error",error)
-      return res.status(401).json({ error: 'Token is invalid' });
+      // console.log("error",error)
+      return res.status(401).json({ error: "Token is invalid" });
     }
-
-
   },
-  
+
   login: async (req, res) => {
     try {
       const { email, password } = req.body;
+
+      
+
       const student = await Students.findOne({ email });
       if (!student)
         return res.status(400).json({ msg: "This email does not exist" });
@@ -194,8 +214,14 @@ const studentCtrl = {
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7days
       });
 
+      if (req.timedout) {
+        return;
+      }
       res.json({ msg: "Login success!" });
     } catch (err) {
+      if (req.timedout) {
+        return;
+      }
       return res.status(500).json({ msg: err.message });
     }
   },

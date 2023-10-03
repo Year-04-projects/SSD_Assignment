@@ -11,14 +11,18 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.0.1",
+    "body-parser": "^1.20.2",
     "cloudinary": "^1.27.0",
+    "connect-timeout": "^1.9.0",
     "cookie-parser": "^1.4.5",
     "cookie-session": "^2.0.0",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "express-fileupload": "^1.2.1",
+    "express-rate-limit": "^7.0.2",
     "express-session": "^1.17.3",
+    "express-validator": "^7.0.1",
     "google-auth-library": "^9.0.0",
     "googleapis": "^88.2.0",
     "jsonwebtoken": "^8.5.1",
@@ -30,6 +34,9 @@
     "nodemon": "^2.0.13",
     "passport": "^0.6.0",
     "passport-google-oauth2": "^0.2.0",
-    "passport-google-oauth20": "^2.0.0"
+    "passport-google-oauth20": "^2.0.0",
+    "pino": "^8.15.3",
+    "pino-pretty": "^10.2.0",
+    "winston": "^3.10.0"
   }
 }

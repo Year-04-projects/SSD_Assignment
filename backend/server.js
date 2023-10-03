@@ -8,17 +8,29 @@ const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
 require("dotenv").config();
 require("./auth");
+const logger=require("./logger/logger");
 const passport=require("passport");
 const PORT = process.env.PORT || 8070;
 const session=require('express-session');
+const rateLimit = require("express-rate-limit");
+const timeout = require("connect-timeout"); 
 
+//limiter to minimize brutforce attack
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, 
+    max: 10,
+    message: "Too many attempts, try again later.",
+  });
 
 app.use(express.json());
+app.set('trust proxy', 1);
 app.use(cors());
 app.use(cookieParser());
 function isLoggedIn(req,res,next){
  req.user?next():res.sendStatus(401);   
 }
+
+
 app.use(session({
     secret:'mysecret',
     resave:false,
@@ -33,8 +45,18 @@ app.use(passport.session());
 //   })
 // );
 app.use('./uploads',express.static(path.join(__dirname,'uploads')));
+//add timeout to minimize DDOS attack
+app.use(timeout("10s"));
 
-app.use(bodyParser.json());
+app.get('/long-request', (req, res) => {
+    setTimeout(() => {
+        req.clearTimeout(); 
+        res.send("Long request completed");
+    }, 15000); // 15 seconds 
+});
+
+//reduced limit request size to avoid exhastion attacks
+app.use(bodyParser.json({ limit: '3mb' }));
 
 
 app.get('/auth/google',passport.authenticate('google',{
@@ -109,7 +131,7 @@ app.use(lecturerRoutes);
 
 
 // students routes
-
+app.use("/student/login", limiter);
 app.use("/student", require("./routes/studentRouter"));
 app.use("/admin", require("./routes/adminRouter"));
 app.use("/api", require("./routes/uploadImg"));

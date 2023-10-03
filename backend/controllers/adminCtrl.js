@@ -3,13 +3,23 @@ const Students = require("../models/studentModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const sendMail = require("./sendMail");
+const { createLogger, transports } = require("winston");
+const logger=require("../logger/logger");
+const { validationResult } = require('express-validator');
 
 const { CLIENT_URL } = process.env;
 
 const adminCtrl = {
   register: async (req, res) => {
     try {
-      console.log(req.body);
+      // console.log(req.body);
+      logger.info('Admin Registration request received');
+      //sanatization
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: "Error in registering" });
+      }
+
       const { firstName, lastName, email, password } = req.body;
 
       if (!firstName || !lastName || !email || !password)
@@ -56,7 +66,7 @@ const adminCtrl = {
         process.env.ACTIVATION_TOKEN_SECRET
       );
 
-      console.log(admin);
+      // console.log(admin);
 
       const { firstName, lastName, email, password } = admin;
 
@@ -111,7 +121,7 @@ const adminCtrl = {
 
         const access_token = createAccessToken({ id: admin.id });
         res.json({ access_token });
-        console.log(admin);
+        // console.log(admin);
       });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
@@ -136,7 +146,7 @@ const adminCtrl = {
   resetPassword: async (req, res) => {
     try {
       const { password } = req.body;
-      console.log(password);
+      // console.log(password);
       const passwordHash = await bcrypt.hash(password, 12);
 
       await Admins.findOneAndUpdate(
