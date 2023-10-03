@@ -9,6 +9,7 @@ import {
   showSuccessMsg,
   showErrorMsg,
 } from "../../utils/notification/notification";
+import DOMPurify from 'dompurify';
 
 const initialState = {
   firstName: "",
@@ -180,6 +181,7 @@ function StudentProfile() {
     }
   };
 
+  const sanitizedThumbnail = DOMPurify.sanitize(thumbnail ? thumbnail : student.thumbnail);
   return (
     <>
       <div className="row">
@@ -195,7 +197,7 @@ function StudentProfile() {
           <h2 className="h4 text-center subtitle">Student Profile</h2>
           <div className="studentThumbnail">
             <img
-              src={thumbnail ? thumbnail : studentdata.thumbnail}
+              src={sanitizedThumbnail}
               alt=""
               className="img-fluid"
             />

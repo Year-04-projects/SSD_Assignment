@@ -2,8 +2,13 @@ const path = require('path');
 const express = require('express');
 const multer = require('multer');
 const Material = require('../models/materials');
+const rateLimit = require('express-rate-limit');
 
 const router = express.Router();
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+});
 
 //save materials
 
@@ -80,7 +85,7 @@ const upload = multer({
 
   //download materials
 
-  router.get('/download/:id', async (req, res) => {
+  router.get('/download/:id',limiter, async (req, res) => {
     try {
       const file = await Material.findById(req.params.id);
       res.set({
