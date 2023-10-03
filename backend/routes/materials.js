@@ -52,12 +52,12 @@ const upload = multer({
         res.send('File uploaded successfully.');
       } catch (error) {
         /*res.status(400).send('Error while uploading file. Try again later.');*/
-        res.status(500).send(error.message);
+        res.status(500).json({message:error.message});
       }
     },
     (error, req, res, next) => {
       if (error) {
-        res.status(500).send(error.message);
+        res.status(500).json({message:error.message});
       }
     }
   );

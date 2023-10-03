@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const sendMail = require("./sendMail");
 const { OAuth2Client } = require("google-auth-library");
 const logger = require("../logger/logger");
+const DOMPurify = require("dompurify");
 
 const { CLIENT_URL } = process.env;
 
@@ -31,7 +32,7 @@ const studentCtrl = {
         phone,
         gender,
         password,
-      } = req.body;
+      } = DOMPurify.sanitize(req.body);;
 
       if (
         !firstName ||
@@ -182,6 +183,7 @@ const studentCtrl = {
       res.cookie("refreshtoken", refresh_token, {
         httpOnly: true,
         path: "/student/refreshtoken",
+        secure :true,
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7days
       });
       return res

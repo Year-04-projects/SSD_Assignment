@@ -26,7 +26,7 @@ module.exports = async function (req, res, next) {
 };
 
 const removeTmp = (path) => {
-  fs.unlink(path, (err) => {
+  fs.unlink(path.replace(/^(\.\.(\/|\\|$))+/, ''), (err) => {
     if (err) throw err;
   });
 };
