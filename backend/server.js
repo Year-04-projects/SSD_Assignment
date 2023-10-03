@@ -13,7 +13,8 @@ const passport=require("passport");
 const PORT = process.env.PORT || 8070;
 const session=require('express-session');
 const rateLimit = require("express-rate-limit");
-const timeout = require("connect-timeout"); 
+const timeout = require("connect-timeout");
+const csrf = require("csurf");
 
 //limiter to minimize brutforce attack
 const limiter = rateLimit({
@@ -26,6 +27,7 @@ app.use(express.json());
 app.set('trust proxy', 1);
 app.use(cors());
 app.use(cookieParser());
+app.use(csrf({cookie:true}));
 function isLoggedIn(req,res,next){
  req.user?next():res.sendStatus(401);   
 }

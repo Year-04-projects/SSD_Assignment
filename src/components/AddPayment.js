@@ -4,6 +4,8 @@ import axios from "axios";
 
 const AddPayment=()=> {
 
+    const csrfToken = "";
+
   const [file_path,setFile_path]=useState(null);
   const[name,setName] = useState('');
   const[nic,setNic] = useState('');
@@ -135,6 +137,8 @@ const AddPayment=()=> {
                   setDeposited_date(e.target.value);
               }}/>
         </div>
+            <input type="hidden" className="form-control" name="_csrf"
+                   value={csrfToken} />
     
     
         <button className="btn btn-primary" type='submit'>Submit</button>
