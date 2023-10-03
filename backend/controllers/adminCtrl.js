@@ -29,7 +29,9 @@ const adminCtrl = {
       if (!validateEmail(email))
         return res.status(400).json({ msg: "Invalid email" });
 
-      const admin = await Admins.findOne({ email });
+      const query = {email:email};
+
+      const admin = await Admins.findOne(query);
       if (admin)
         return res.status(400).json({ msg: "This email already exists" });
 
