@@ -212,6 +212,7 @@ const studentCtrl = {
       const refresh_token = createRefreshToken({ id: student._id });
       res.cookie("refreshtoken", refresh_token, {
         httpOnly: true,
+        secure: true,
         path: "/student/refreshtoken",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7days
       });
@@ -244,7 +245,7 @@ const studentCtrl = {
   },
   forgotPassword: async (req, res) => {
     try {
-      const { email } = req.body;
+      const { email } = DOMPurify.sanitize(req.body);;
       const student = await Students.findOne({ email });
       if (!student)
         return res.status(400).json({ msg: "This email does not exist" });

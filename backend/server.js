@@ -15,6 +15,7 @@ const session=require('express-session');
 const rateLimit = require("express-rate-limit");
 const timeout = require("connect-timeout");
 const csrf = require("csurf");
+const helmet = require('helmet');
 
 //limiter to minimize brutforce attack
 const limiter = rateLimit({
@@ -32,6 +33,7 @@ function isLoggedIn(req,res,next){
  req.user?next():res.sendStatus(401);   
 }
 
+app.use(helmet());
 
 app.use(session({
     secret:'mysecret',

@@ -6,6 +6,7 @@ const sendMail = require("./sendMail");
 const { createLogger, transports } = require("winston");
 const logger=require("../logger/logger");
 const { validationResult } = require('express-validator');
+const DOMPurify = require("DOMPurify");
 
 const { CLIENT_URL } = process.env;
 
@@ -20,7 +21,7 @@ const adminCtrl = {
         return res.status(400).json({ errors: "Error in registering" });
       }
 
-      const { firstName, lastName, email, password } = req.body;
+      const { firstName, lastName, email, password } = DOMPurify.sanitize(req.body);
 
       if (!firstName || !lastName || !email || !password)
         return res.status(400).json({ msg: "Please fill in all fields" });
@@ -102,6 +103,7 @@ const adminCtrl = {
       const refresh_token = createRefreshToken({ id: admin._id });
       res.cookie("refreshtoken", refresh_token, {
         httpOnly: true,
+        secure: true,
         path: "/admin/refreshtoken",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7days
       });
@@ -129,7 +131,7 @@ const adminCtrl = {
   },
   forgotPassword: async (req, res) => {
     try {
-      const { email } = req.body;
+      const { email } = DOMPurify.sanitize(req.body);
       const admin = await Admins.findOne({ email });
       if (!admin)
         return res.status(400).json({ msg: "This email does not exist" });
