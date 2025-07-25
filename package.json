@@ -18,7 +18,7 @@
     "express": "^4.17.1",
     "express-fileupload": "^1.2.1",
     "file-saver": "^2.0.5",
-    "form-data": "^4.0.0",
+    "form-data": "^4.0.4",
     "gapi-script": "^1.2.0",
     "googleapis": "^85.0.0",
     "jsonwebtoken": "^8.5.1",
