@@ -24,7 +24,7 @@
     "express-session": "^1.17.3",
     "express-validator": "^7.0.1",
     "google-auth-library": "^9.0.0",
-    "googleapis": "^88.2.0",
+    "googleapis": "^124.0.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.13.9",
     "mongoose-date-format": "^1.2.0",
